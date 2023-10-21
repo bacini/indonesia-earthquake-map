@@ -18,11 +18,12 @@ export default {
     };
   },
   methods: {
-    addMarker(event) {
+    addPopup(event) {
       if (!this.clusterData) {
         return;
       }
 
+      // radius resiko dalam kilometer
       const riskRadii = {
         Kecil: 40,
         Sedang: 50,
@@ -44,6 +45,8 @@ export default {
         .setContent(popupContent)
         .openOn(this.map);
     },
+
+    // Hitung jumlah gempa disekitar radius lokasi
     calculateRiskCounts(clickedCoords, riskRadii) {
       const riskCounts = {
         Kecil: 0,
@@ -63,25 +66,24 @@ export default {
           earthquakeCoord
         );
 
-        const clusterLabel = {
-          label: earthquake.cluster_label,
-        };
+        const clusterLabel = earthquake.cluster_label;
 
+        // Kalkulasi total gempa disekitar lokasi yang dipilih
         if (
-          clusterLabel["label"] === 5 &&
+          clusterLabel === 5 &&
           distanceToEarthquake <= riskRadii["Berbahaya"]
         ) {
           riskCounts["Berbahaya"]++;
         } else if (
-          clusterLabel["label"] === 2 &&
+          clusterLabel === 2 &&
           distanceToEarthquake <= riskRadii["Tinggi"]
         ) {
           riskCounts["Tinggi"]++;
-        } else if (clusterLabel["label"] === 0 || clusterLabel["label"] === 4) {
+        } else if (clusterLabel === 0 || clusterLabel === 4) {
           if (distanceToEarthquake <= riskRadii["Sedang"]) {
             riskCounts["Sedang"]++;
           }
-        } else if (clusterLabel["label"] === 1 || clusterLabel["label"] === 3) {
+        } else if (clusterLabel === 1 || clusterLabel === 3) {
           if (distanceToEarthquake <= riskRadii["Kecil"]) {
             riskCounts["Kecil"]++;
           }
@@ -90,6 +92,8 @@ export default {
 
       return riskCounts;
     },
+
+    // risk level
     calculateRiskLevel(riskCounts) {
       if (riskCounts.Berbahaya >= 3) return "Berbahaya";
       else if (riskCounts.Tinggi >= 5) return "Tinggi";
@@ -97,8 +101,10 @@ export default {
       else if (riskCounts.Kecil >= 48) return "Kecil";
       else return "Safe";
     },
+
+    // Haversine formula untuk menghitung radius pada area yang dipilih
     calculateDistance(coord1, coord2) {
-      const R = 6371; // Earth's radius in kilometers
+      const R = 6371;
       const lat1 = coord1.lat;
       const lon1 = coord1.lng;
       const lat2 = coord2.lat;
@@ -118,6 +124,8 @@ export default {
       const distance = R * c;
       return distance;
     },
+
+    // generate popup
     generatePopupContent(riskLevel, riskCounts, event) {
       let content = `<b>Risk Level: ${riskLevel}</b><br><br>`;
 
@@ -140,7 +148,7 @@ export default {
       this.map
     );
 
-    this.map.on("click", this.addMarker);
+    this.map.on("click", this.addPopup);
 
     Axios.get("/cluster_data.json")
       .then((response) => {
