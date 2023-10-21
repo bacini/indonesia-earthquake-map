@@ -119,13 +119,16 @@ export default {
       return distance;
     },
     generatePopupContent(riskLevel, riskCounts, event) {
-      let content = `Risk Level: ${riskLevel}<br>`;
-      content += `Latitude: ${event.latlng.lat}<br>`;
-      content += `Longitude: ${event.latlng.lng}<br><br>`;
+      let content = `<b>Risk Level: ${riskLevel}</b><br><br>`;
 
       for (const level in riskCounts) {
-        content += `Gempa ${level}: ${riskCounts[level]}<br>`;
+        content += `Gempa ${level === "Tinggi" ? "Besar" : level}: ${
+          riskCounts[level]
+        }<br>`;
       }
+
+      content += `<br>Latitude: ${event.latlng.lat}<br>`;
+      content += `Longitude: ${event.latlng.lng}<br>`;
 
       return content;
     },
