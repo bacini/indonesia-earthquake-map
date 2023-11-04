@@ -21,4 +21,5 @@ npm run build
 ```
 
 ###User Interaction
+
 Randomly click on the map of Indonesia and discover what you can find!
